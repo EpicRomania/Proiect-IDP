@@ -69,8 +69,6 @@ Repository principal: https://github.com/EpicRomania/Proiect-IDP
 - Definirea si ajustarea retelelor Docker necesare separarii logice a componentelor.
 
 ### Commit Evidence
-> Completati aceasta sectiune dupa ce dati push la modificarile reale pentru Etapa 2. Cerinta mentioneaza ca implementarea de 40% trebuie dovedita prin commit-uri in repository.
-
 - `TODO_HASH_1` - Initializare structura microservicii Spring Boot - Negrea Andrei
 - `TODO_HASH_2` - Adaugare modele si endpoint-uri initiale pentru autentificare - Negrea Andrei
 - `TODO_HASH_3` - Adaugare endpoint-uri initiale pentru evenimente si participare - Negrea Andrei
