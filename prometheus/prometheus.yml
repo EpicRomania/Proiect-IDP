@@ -1,1 +1,22 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
 
+scrape_configs:
+  - job_name: "user-authentication-service"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets:
+          - "user-authentication-service:8080"
+
+  - job_name: "event-management-service"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets:
+          - "event-management-service:8080"
+
+  - job_name: "participation-service"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets:
+          - "participation-service:8080"
