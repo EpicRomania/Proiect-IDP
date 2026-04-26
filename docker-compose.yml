@@ -1,1 +1,163 @@
 
+services:
+  user-authentication-db-service:
+    image: postgres:16
+    container_name: user-authentication-db-service
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - auth-db-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  event-data-db-service:
+    image: postgres:16
+    container_name: event-data-db-service
+    environment:
+      POSTGRES_DB: event_db
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_pass
+    volumes:
+      - event_db_data:/var/lib/postgresql/data
+    networks:
+      - event-db-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U event_user -d event_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user-authentication-service:
+    build: ./services/user-authentication-service
+    container_name: user-authentication-service
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-authentication-db-service:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: auth_pass
+    depends_on:
+      user-authentication-db-service:
+        condition: service_healthy
+    networks:
+      - auth-db-network
+      - backend-network
+      - monitoring-network
+
+  event-management-service:
+    build: ./services/event-management-service
+    container_name: event-management-service
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-data-db-service:5432/event_db
+      SPRING_DATASOURCE_USERNAME: event_user
+      SPRING_DATASOURCE_PASSWORD: event_pass
+    depends_on:
+      event-data-db-service:
+        condition: service_healthy
+    networks:
+      - event-db-network
+      - backend-network
+      - monitoring-network
+
+  participation-service:
+    build: ./services/participation-service
+    container_name: participation-service
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-data-db-service:5432/event_db
+      SPRING_DATASOURCE_USERNAME: event_user
+      SPRING_DATASOURCE_PASSWORD: event_pass
+    depends_on:
+      event-data-db-service:
+        condition: service_healthy
+    networks:
+      - event-db-network
+      - backend-network
+      - monitoring-network
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - "8088:8080"
+    networks:
+      - auth-db-network
+      - event-db-network
+
+  kong:
+    image: kong:3.6
+    container_name: kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    volumes:
+      - ./kong/kong.yml:/kong/declarative/kong.yml:ro
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    depends_on:
+      - user-authentication-service
+      - event-management-service
+      - participation-service
+    networks:
+      - backend-network
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - user-authentication-service
+      - event-management-service
+      - participation-service
+    networks:
+      - monitoring-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring-network
+
+volumes:
+  auth_db_data:
+  event_db_data:
+  portainer_data:
+  grafana_data:
+
+networks:
+  auth-db-network:
+  event-db-network:
+  backend-network:
+  monitoring-network:
