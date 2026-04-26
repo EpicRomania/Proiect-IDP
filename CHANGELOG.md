@@ -1,8 +1,4 @@
 # Changelog - EventHub
-
-Toate modificarile notabile ale proiectului EventHub sunt documentate in acest fisier.
-Formatul este inspirat din Keep a Changelog 1.1.0, cu adaptari pentru cerinta Etapei 2 IDP.
-
 Proiect: EventHub - platforma de gestionare a evenimentelor  
 Echipa: Negrea Andrei, Iancu Andrei-Vlad  
 Grupa: 344C4  
