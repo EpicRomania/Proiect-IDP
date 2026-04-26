@@ -1,1 +1,27 @@
+_format_version: "3.0"
+_transform: true
 
+services:
+  - name: user-authentication-service
+    url: http://user-authentication-service:8080
+    routes:
+      - name: auth-routes
+        paths:
+          - /auth
+        strip_path: false
+
+  - name: event-management-service
+    url: http://event-management-service:8080
+    routes:
+      - name: event-routes
+        paths:
+          - /events
+        strip_path: false
+
+  - name: participation-service
+    url: http://participation-service:8080
+    routes:
+      - name: participation-routes
+        paths:
+          - /participations
+        strip_path: false
