@@ -1,0 +1,10 @@
+/workspace/src/main/java/events/Event.java
+/workspace/src/main/java/events/EventManagementApplication.java
+/workspace/src/main/java/events/EventRepository.java
+/workspace/src/main/java/events/dto/EventRequest.java
+/workspace/src/main/java/events/dto/EventResponse.java
+/workspace/src/main/java/events/service/BadRequestException.java
+/workspace/src/main/java/events/service/EventService.java
+/workspace/src/main/java/events/service/NotFoundException.java
+/workspace/src/main/java/events/web/ApiExceptionHandler.java
+/workspace/src/main/java/events/web/EventController.java

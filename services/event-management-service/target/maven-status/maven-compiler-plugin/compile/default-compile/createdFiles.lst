@@ -1,0 +1,10 @@
+events/Event.class
+events/EventManagementApplication.class
+events/web/EventController.class
+events/EventRepository.class
+events/service/EventService.class
+events/dto/EventResponse.class
+events/dto/EventRequest.class
+events/web/ApiExceptionHandler.class
+events/service/BadRequestException.class
+events/service/NotFoundException.class
