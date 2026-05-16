@@ -3,6 +3,7 @@ services:
   user-authentication-db-service:
     image: postgres:16
     container_name: user-authentication-db-service
+    restart: unless-stopped
     environment:
       POSTGRES_DB: auth_db
       POSTGRES_USER: auth_user
@@ -20,6 +21,7 @@ services:
   event-data-db-service:
     image: postgres:16
     container_name: event-data-db-service
+    restart: unless-stopped
     environment:
       POSTGRES_DB: event_db
       POSTGRES_USER: event_user
@@ -83,10 +85,16 @@ services:
       - monitoring-network
 
   adminer:
-    image: adminer:latest
+    image: adminer:4.8.1
     container_name: adminer
+    restart: unless-stopped
     ports:
       - "8088:8080"
+    depends_on:
+      user-authentication-db-service:
+        condition: service_healthy
+      event-data-db-service:
+        condition: service_healthy
     networks:
       - auth-db-network
       - event-db-network
@@ -94,6 +102,7 @@ services:
   kong:
     image: kong:3.6
     container_name: kong
+    restart: unless-stopped
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
@@ -115,13 +124,16 @@ services:
       - backend-network
 
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.21.5
     container_name: portainer
+    restart: unless-stopped
     ports:
       - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    networks:
+      - management-network
 
   prometheus:
     image: prom/prometheus:latest
@@ -161,3 +173,4 @@ networks:
   event-db-network:
   backend-network:
   monitoring-network:
+  management-network:

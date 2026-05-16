@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+  namespace: eventhub-gateway
+  labels:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: gateway
+    eventhub.io/role: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kong
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kong
+        app.kubernetes.io/part-of: eventhub
+        app.kubernetes.io/component: gateway
+        eventhub.io/role: gateway
+    spec:
+      containers:
+        - name: kong
+          image: kong:3.6
+          ports:
+            - name: proxy
+              containerPort: 8000
+            - name: admin
+              containerPort: 8001
+          env:
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_DECLARATIVE_CONFIG
+              value: /kong/declarative/kong.yml
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_LISTEN
+              value: 0.0.0.0:8001
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 40
+            periodSeconds: 20
+          volumeMounts:
+            - name: kong-config
+              mountPath: /kong/declarative/kong.yml
+              subPath: kong.yml
+              readOnly: true
+      volumes:
+        - name: kong-config
+          configMap:
+            name: kong-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong
+  namespace: eventhub-gateway
+  labels:
+    app.kubernetes.io/name: kong
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: gateway
+    eventhub.io/role: gateway
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: kong
+  ports:
+    - name: proxy
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080
+    - name: admin
+      port: 8001
+      targetPort: 8001
+      nodePort: 30081

@@ -1,0 +1,183 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auth-db-data
+  namespace: eventhub-data
+  labels:
+    app.kubernetes.io/name: user-authentication-db-service
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: database
+    eventhub.io/role: data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: event-db-data
+  namespace: eventhub-data
+  labels:
+    app.kubernetes.io/name: event-data-db-service
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: database
+    eventhub.io/role: data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-authentication-db-service
+  namespace: eventhub-data
+  labels:
+    app.kubernetes.io/name: user-authentication-db-service
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: database
+    eventhub.io/role: data
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: user-authentication-db-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: user-authentication-db-service
+        app.kubernetes.io/part-of: eventhub
+        app.kubernetes.io/component: database
+        eventhub.io/role: data
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: auth-db-secret
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: auth-db-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-authentication-db-service
+  namespace: eventhub-data
+  labels:
+    app.kubernetes.io/name: user-authentication-db-service
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: database
+    eventhub.io/role: data
+spec:
+  selector:
+    app.kubernetes.io/name: user-authentication-db-service
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-data-db-service
+  namespace: eventhub-data
+  labels:
+    app.kubernetes.io/name: event-data-db-service
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: database
+    eventhub.io/role: data
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: event-data-db-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: event-data-db-service
+        app.kubernetes.io/part-of: eventhub
+        app.kubernetes.io/component: database
+        eventhub.io/role: data
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: event-db-secret
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: event-db-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-data-db-service
+  namespace: eventhub-data
+  labels:
+    app.kubernetes.io/name: event-data-db-service
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: database
+    eventhub.io/role: data
+spec:
+  selector:
+    app.kubernetes.io/name: event-data-db-service
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

@@ -1,22 +1,74 @@
 # Changelog - EventHub
-Proiect: EventHub - platforma de gestionare a evenimentelor  
-Echipa: Negrea Andrei, Iancu Andrei-Vlad  
-Grupa: 344C4  
-Repository principal: https://github.com/EpicRomania/Proiect-IDP
 
-## [Unreleased]
+Proiect: EventHub - platforma de gestionare a evenimentelor
+Echipa: Negrea Andrei, Iancu Andrei-Vlad
+Grupa: 344C4
+Repository principal: https://github.com/EpicRomania/Proiect-IDP/tree/main
 
-### Planned
-- Finalizarea functionalitatilor backend pentru toate cele 3 microservicii.
-- Rularea aplicatiei intr-un cluster Docker Swarm cu un manager si doi workers.
-- Adaugarea tag-urilor de deployment in configuratia de stack.
-- Configurarea pipeline-ului de CI/CD pentru build si deployment automat.
-- Stabilizarea rutelor expuse prin Kong API Gateway.
-- Extinderea dashboard-urilor Grafana si a metricilor colectate cu Prometheus.
+## [0.8.0] - 2026-05-16
+
+### Added
+
+- Finalizarea rularii EventHub pe Kubernetes cu manifesturi pentru namespace-uri separate:
+  - `eventhub-app`;
+  - `eventhub-data`;
+  - `eventhub-gateway`;
+  - `eventhub-observability`;
+  - `eventhub-management`.
+- Adaugarea resurselor Kubernetes pentru cele 3 microservicii proprii, bazele de date PostgreSQL, Kong, Adminer, Portainer, Prometheus si Grafana.
+- Adaugarea Secret-urilor pentru credentialele bazelor de date, ConfigMap-urilor pentru Kong/Prometheus/Grafana si PVC-urilor pentru PostgreSQL, Grafana si Portainer.
+- Adaugarea etichetelor de deployment, NetworkPolicy-urilor si initContainer-elor care asteapta bazele de date inainte de pornirea serviciilor Spring Boot.
+- Adaugarea configuratiei `kind` si a scripturilor PowerShell pentru pornirea si oprirea stack-ului Kubernetes local.
+- Actualizarea documentatiei de rulare si verificare pentru scenariul Kubernetes.
+
+### Verification / Validation
+
+```text
+Verification showcase:
+- PowerShell scripts: syntax OK
+- Maven tests: auth 3/3, events 4/4, participation 5/5
+- Docker Compose config: OK
+- Kubernetes start script: OK
+- Kubernetes pods: 10/10 Running, 0 restarts
+- Kong routes: /auth, /events, /participations
+- API smoke: register/login/event CRUD/participation flow OK
+- Expected errors: duplicate register 409, bad login 401, duplicate participation 409, missing withdraw 404
+- Prometheus targets: auth=1, events=1, participation=1
+- Grafana health: ok
+- Adminer: HTTP 200
+- Portainer: 2.21.5
+- Kubernetes stop script: OK
+```
+
+## [0.7.0] - 2026-05-10
+
+### Added
+
+- Configurarea monitorizarii Negrea pentru cele 3 servicii Spring Boot prin Actuator si Micrometer Prometheus.
+- Definirea joburilor Prometheus pentru `user-authentication-service`, `event-management-service` si `participation-service`.
+- Provisionarea sursei de date Prometheus in Grafana si adaugarea dashboard-ului pentru disponibilitatea serviciilor si rata requesturilor HTTP.
+
+## [0.5.0] - 2026-05-06
+
+### Added
+
+- Integrarea modificarilor Iancu pentru infrastructura Docker Compose: politici `restart: unless-stopped` pentru bazele de date, Adminer, Kong si Portainer.
+- Pin-uirea imaginilor `adminer:4.8.1` si `portainer/portainer-ce:2.21.5` pentru rulare reproductibila.
+- Adaugarea dependentelor Adminer pe healthcheck-urile celor doua baze de date PostgreSQL.
+- Atasarea Portainer la `management-network` si adaugarea retelei dedicate pentru administrare.
+
+## [0.3.0] - 2026-05-01
+
+### Added
+
+- Finalizarea de catre Negrea a `user-authentication-service` cu utilizatori, roluri, BCrypt pentru parole, token-uri de acces si endpointurile `/auth/register`, `/auth/login`, `/auth/me`, `/auth/users`.
+- Finalizarea de catre Negrea a `event-management-service` cu creare, listare, interogare, modificare si stergere evenimente persistate in PostgreSQL.
+- Finalizarea de catre Negrea a `participation-service` cu inscriere, retragere, listarea participantilor si verificarea existentei evenimentelor in baza de date.
 
 ## [0.2.0] - 2026-04-26
 
 ### Added
+
 - Adaugarea structurii initiale pentru cele 3 microservicii proprii:
   - `user-authentication-service`, responsabil de autentificare, autorizare, conturi si token-uri de acces;
   - `event-management-service`, responsabil de creare, editare, stergere si listare evenimente;
@@ -30,55 +82,34 @@ Repository principal: https://github.com/EpicRomania/Proiect-IDP
 - Adaugarea fisierelor Docker/Docker Compose necesare pentru rularea locala a serviciilor dezvoltate pana in aceasta etapa.
 
 ### Changed
+
 - Organizarea proiectului in componente separate, astfel incat fiecare microserviciu sa poata fi dezvoltat si rulat independent.
 - Separarea logica a serviciilor si a bazelor de date prin retele Docker dedicate.
-- Actualizarea structurii proiectului pentru a pregati extinderea catre Docker Swarm.
+- Actualizarea structurii proiectului pentru a pregati extinderea catre Kubernetes.
 
 ### Fixed
+
 - Corectarea configuratiilor initiale de conectare intre microservicii si bazele de date.
 - Ajustarea variabilelor de mediu folosite pentru conectarea serviciilor in containere.
 
 ### In Progress
+
 - Validarea completa a fluxului de autentificare si autorizare.
 - Integrarea completa intre `event-management-service` si `participation-service`.
 - Testarea rutelor expuse prin Kong API Gateway.
 - Finalizarea configuratiei de monitoring pentru metrici aplicative relevante.
-- Pregatirea configuratiei de deployment pentru Docker Swarm.
+- Pregatirea configuratiei de deployment pentru Kubernetes.
 
 ### Progress Summary
+
 - Stadiu estimat proiect: aproximativ 40%.
 - Functionalitatile principale aflate in progres sunt autentificarea, administrarea evenimentelor, inscrierea la evenimente si rularea serviciilor in containere Docker.
 - In aceasta etapa s-a pus accent pe structura microserviciilor, containerele de baza, bazele de date, conectivitatea initiala si componentele suport necesare pentru etapa finala.
 
-### Contributions
-
-#### Negrea Andrei
-- Implementarea structurii de baza pentru `user-authentication-service`.
-- Implementarea structurii de baza pentru `event-management-service`.
-- Implementarea structurii de baza pentru `participation-service`.
-- Definirea fluxurilor principale pentru autentificare, evenimente si participare.
-- Configurarea initiala a monitorizarii cu Prometheus si Grafana.
-- Integrarea initiala a microserviciilor cu mediul Docker.
-
-#### Iancu Andrei-Vlad
-- Configurarea `user-authentication-db-service` folosind PostgreSQL.
-- Configurarea `event-data-db-service` folosind PostgreSQL.
-- Configurarea serviciului Adminer pentru administrarea bazelor de date.
-- Configurarea initiala a Kong API Gateway pentru rutarea cererilor externe.
-- Configurarea Portainer pentru administrarea vizuala a containerelor.
-- Definirea si ajustarea retelelor Docker necesare separarii logice a componentelor.
-
-### Commit Evidence
-- `TODO_HASH_1` - Initializare structura microservicii Spring Boot - Negrea Andrei
-- `TODO_HASH_2` - Adaugare modele si endpoint-uri initiale pentru autentificare - Negrea Andrei
-- `TODO_HASH_3` - Adaugare endpoint-uri initiale pentru evenimente si participare - Negrea Andrei
-- `TODO_HASH_4` - Configurare servicii PostgreSQL si Adminer - Iancu Andrei-Vlad
-- `TODO_HASH_5` - Configurare Kong, Portainer si retele Docker - Iancu Andrei-Vlad
-- `TODO_HASH_6` - Configurare Prometheus si Grafana - Negrea Andrei
-
 ## [0.1.0] - 2026-03-29
 
 ### Added
+
 - Formarea echipei de proiect: Negrea Andrei si Iancu Andrei-Vlad.
 - Alegerea temei proiectului: EventHub, platforma cloud-native pentru gestionarea evenimentelor.
 - Stabilirea arhitecturii initiale bazate pe microservicii si containere Docker.
@@ -93,19 +124,5 @@ Repository principal: https://github.com/EpicRomania/Proiect-IDP
   - Prometheus;
   - Grafana.
 - Stabilirea comunicarii intre servicii prin HTTP/REST.
-- Stabilirea rularii locale cu Docker Compose si a extinderii ulterioare catre Docker Swarm.
+- Stabilirea rularii locale cu Docker Compose si a extinderii ulterioare catre Kubernetes.
 - Crearea repository-ului principal pentru proiect.
-
-### Contributions
-
-#### Negrea Andrei
-- Asumarea implementarii microserviciilor proprii.
-- Asumarea configurarii monitorizarii cu Prometheus si Grafana.
-
-#### Iancu Andrei-Vlad
-- Asumarea configurarii serviciilor de baza de date.
-- Asumarea configurarii Kong API Gateway, Portainer si Adminer.
-
-### Commit Evidence
-- `3f126f9` - Initial commit - EpicRomania
-

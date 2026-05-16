@@ -1,0 +1,124 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-ingress-from-gateway-and-prometheus
+  namespace: eventhub-app
+  labels:
+    app.kubernetes.io/name: eventhub-app-network-policy
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: network-policy
+    eventhub.io/role: app
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: application
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              eventhub.io/role: gateway
+        - namespaceSelector:
+            matchLabels:
+              eventhub.io/role: observability
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-ingress-from-app-and-management
+  namespace: eventhub-data
+  labels:
+    app.kubernetes.io/name: eventhub-data-network-policy
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: network-policy
+    eventhub.io/role: data
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: database
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              eventhub.io/role: app
+        - namespaceSelector:
+            matchLabels:
+              eventhub.io/role: management
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-ingress-from-node
+  namespace: eventhub-gateway
+  labels:
+    app.kubernetes.io/name: eventhub-gateway-network-policy
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: network-policy
+    eventhub.io/role: gateway
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: kong
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8001
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: observability-ingress-from-node
+  namespace: eventhub-observability
+  labels:
+    app.kubernetes.io/name: eventhub-observability-network-policy
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: network-policy
+    eventhub.io/role: observability
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: observability
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 9090
+        - protocol: TCP
+          port: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: management-ingress-from-node
+  namespace: eventhub-management
+  labels:
+    app.kubernetes.io/name: eventhub-management-network-policy
+    app.kubernetes.io/part-of: eventhub
+    app.kubernetes.io/component: network-policy
+    eventhub.io/role: management
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: management
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 9000

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eventhub-app
+  labels:
+    app.kubernetes.io/part-of: eventhub
+    eventhub.io/role: app
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eventhub-data
+  labels:
+    app.kubernetes.io/part-of: eventhub
+    eventhub.io/role: data
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eventhub-gateway
+  labels:
+    app.kubernetes.io/part-of: eventhub
+    eventhub.io/role: gateway
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eventhub-observability
+  labels:
+    app.kubernetes.io/part-of: eventhub
+    eventhub.io/role: observability
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eventhub-management
+  labels:
+    app.kubernetes.io/part-of: eventhub
+    eventhub.io/role: management
