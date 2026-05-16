@@ -1,0 +1,16 @@
+/workspace/src/main/java/auth/SecurityConfig.java
+/workspace/src/main/java/auth/UserAuthenticationApplication.java
+/workspace/src/main/java/auth/domain/AccessToken.java
+/workspace/src/main/java/auth/domain/AppUser.java
+/workspace/src/main/java/auth/domain/Role.java
+/workspace/src/main/java/auth/dto/AuthResponse.java
+/workspace/src/main/java/auth/dto/LoginRequest.java
+/workspace/src/main/java/auth/dto/RegisterRequest.java
+/workspace/src/main/java/auth/dto/UserResponse.java
+/workspace/src/main/java/auth/repository/AccessTokenRepository.java
+/workspace/src/main/java/auth/repository/UserRepository.java
+/workspace/src/main/java/auth/service/AuthService.java
+/workspace/src/main/java/auth/service/ConflictException.java
+/workspace/src/main/java/auth/service/UnauthorizedException.java
+/workspace/src/main/java/auth/web/ApiExceptionHandler.java
+/workspace/src/main/java/auth/web/AuthController.java

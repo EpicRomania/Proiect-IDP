@@ -1,0 +1,16 @@
+auth/dto/AuthResponse.class
+auth/web/AuthController.class
+auth/service/ConflictException.class
+auth/repository/AccessTokenRepository.class
+auth/domain/AppUser.class
+auth/dto/LoginRequest.class
+auth/dto/UserResponse.class
+auth/web/ApiExceptionHandler.class
+auth/UserAuthenticationApplication.class
+auth/SecurityConfig.class
+auth/repository/UserRepository.class
+auth/domain/Role.class
+auth/service/UnauthorizedException.class
+auth/service/AuthService.class
+auth/dto/RegisterRequest.class
+auth/domain/AccessToken.class
