@@ -1,0 +1,11 @@
+/workspace/src/main/java/participation/Participation.java
+/workspace/src/main/java/participation/ParticipationApplication.java
+/workspace/src/main/java/participation/ParticipationRepository.java
+/workspace/src/main/java/participation/dto/ParticipationRequest.java
+/workspace/src/main/java/participation/dto/ParticipationResponse.java
+/workspace/src/main/java/participation/service/BadRequestException.java
+/workspace/src/main/java/participation/service/ConflictException.java
+/workspace/src/main/java/participation/service/NotFoundException.java
+/workspace/src/main/java/participation/service/ParticipationService.java
+/workspace/src/main/java/participation/web/ApiExceptionHandler.java
+/workspace/src/main/java/participation/web/ParticipationController.java
