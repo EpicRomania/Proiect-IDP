@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="auth.AuthServiceTest" time="2.71" tests="7" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="auth.web.AuthControllerTest" time="4.591" tests="7" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -8,6 +8,7 @@
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.vendor.url" value="https://adoptium.net/"/>
     <property name="user.timezone" value="Etc/UTC"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
     <property name="os.name" value="Linux"/>
     <property name="java.vm.specification.version" value="21"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
@@ -28,6 +29,8 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
     <property name="surefire.real.class.path" value="/workspace/target/surefire/surefirebooter-20260516204649860_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.7+6-LTS"/>
@@ -46,6 +49,8 @@
     <property name="user.dir" value="/workspace"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="124"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
     <property name="native.encoding" value="UTF-8"/>
     <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
@@ -54,18 +59,33 @@
     <property name="java.vm.version" value="21.0.7+6-LTS"/>
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[user-authentication-service] "/>
   </properties>
-  <testcase name="registerRejectsDuplicateEmail" classname="auth.AuthServiceTest" time="0.234">
-    <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.19/byte-buddy-agent-1.14.19.jar)
-WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
-WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
-WARNING: Dynamic loading of agents will be disallowed by default in a future release
-]]></system-err>
+  <testcase name="meUsesBearerAuthorizationHeader" classname="auth.web.AuthControllerTest" time="0.472">
+    <system-out><![CDATA[20:46:53.659 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [auth.web.AuthControllerTest]: AuthControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:46:54.017 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration auth.UserAuthenticationApplication for test class auth.web.AuthControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-05-16T20:46:54.933Z  INFO 124 --- [user-authentication-service] [           main] auth.web.AuthControllerTest              : Starting AuthControllerTest using Java 21.0.7 with PID 124 (started by root in /workspace)
+2026-05-16T20:46:54.936Z  INFO 124 --- [user-authentication-service] [           main] auth.web.AuthControllerTest              : No active profile set, falling back to 1 default profile: "default"
+2026-05-16T20:46:57.147Z  INFO 124 --- [user-authentication-service] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-05-16T20:46:57.147Z  INFO 124 --- [user-authentication-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-16T20:46:57.149Z  INFO 124 --- [user-authentication-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-05-16T20:46:57.178Z  INFO 124 --- [user-authentication-service] [           main] auth.web.AuthControllerTest              : Started AuthControllerTest in 3.014 seconds (process running for 7.204)
+]]></system-out>
   </testcase>
-  <testcase name="loginReturnsAccessToken" classname="auth.AuthServiceTest" time="0.119"/>
-  <testcase name="currentUserReturnsTokenOwner" classname="auth.AuthServiceTest" time="0.047"/>
-  <testcase name="registerRejectsDuplicateUsername" classname="auth.AuthServiceTest" time="0.002"/>
-  <testcase name="loginRejectsInvalidPassword" classname="auth.AuthServiceTest" time="0.095"/>
-  <testcase name="registerCreatesUserWithDefaultRole" classname="auth.AuthServiceTest" time="0.046"/>
-  <testcase name="currentUserRejectsMissingBearerToken" classname="auth.AuthServiceTest" time="0.001"/>
+  <testcase name="registerReturnsCreatedUser" classname="auth.web.AuthControllerTest" time="0.285"/>
+  <testcase name="loginReturnsAccessToken" classname="auth.web.AuthControllerTest" time="0.009"/>
+  <testcase name="usersReturnsAllUsers" classname="auth.web.AuthControllerTest" time="0.017"/>
+  <testcase name="invalidLoginReturnsUnauthorized" classname="auth.web.AuthControllerTest" time="0.039"/>
+  <testcase name="invalidRegisterPayloadReturnsBadRequest" classname="auth.web.AuthControllerTest" time="0.04"/>
+  <testcase name="duplicateRegisterReturnsConflict" classname="auth.web.AuthControllerTest" time="0.004"/>
 </testsuite>

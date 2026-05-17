@@ -1,0 +1,68 @@
+name: EventHub CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-build-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Test user authentication service
+        working-directory: services/user-authentication-service
+        run: mvn -B test
+
+      - name: Test event management service
+        working-directory: services/event-management-service
+        run: mvn -B test
+
+      - name: Test participation service
+        working-directory: services/participation-service
+        run: mvn -B test
+
+      - name: Package user authentication service
+        working-directory: services/user-authentication-service
+        run: mvn -B package -DskipTests
+
+      - name: Package event management service
+        working-directory: services/event-management-service
+        run: mvn -B package -DskipTests
+
+      - name: Package participation service
+        working-directory: services/participation-service
+        run: mvn -B package -DskipTests
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config --quiet
+
+      - name: Build user authentication image
+        run: docker build -t eventhub/user-authentication-service:ci ./services/user-authentication-service
+
+      - name: Build event management image
+        run: docker build -t eventhub/event-management-service:ci ./services/event-management-service
+
+      - name: Build participation image
+        run: docker build -t eventhub/participation-service:ci ./services/participation-service
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Validate Kubernetes manifests when a cluster context is available
+        shell: bash
+        run: |
+          if kubectl cluster-info >/dev/null 2>&1; then
+            kubectl apply --dry-run=client --validate=false -f k8s/
+          else
+            echo "No Kubernetes cluster context is available; skipping optional manifest dry-run."
+          fi

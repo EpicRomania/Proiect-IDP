@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
-Test set: auth.AuthServiceTest
+Test set: events.web.EventControllerTest
 -------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.710 s -- in auth.AuthServiceTest
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.200 s -- in events.web.EventControllerTest

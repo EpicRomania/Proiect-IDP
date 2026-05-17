@@ -8,6 +8,7 @@ import auth.dto.RegisterRequest;
 import auth.repository.AccessTokenRepository;
 import auth.repository.UserRepository;
 import auth.service.AuthService;
+import auth.service.ConflictException;
 import auth.service.UnauthorizedException;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,6 +46,30 @@ class AuthServiceTest {
     }
 
     @Test
+    void registerRejectsDuplicateUsername() {
+        when(userRepository.existsByUsername("andrei")).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.register(new RegisterRequest(
+                "andrei",
+                "andrei@example.com",
+                "secret123",
+                Role.USER
+        ))).isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void registerRejectsDuplicateEmail() {
+        when(userRepository.existsByEmail("andrei@example.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.register(new RegisterRequest(
+                "andrei",
+                "andrei@example.com",
+                "secret123",
+                Role.USER
+        ))).isInstanceOf(ConflictException.class);
+    }
+
+    @Test
     void loginRejectsInvalidPassword() {
         AppUser user = new AppUser(
                 "andrei",
@@ -75,5 +100,32 @@ class AuthServiceTest {
 
         assertThat(response.token()).isNotBlank();
         assertThat(response.user().role()).isEqualTo(Role.ORGANIZER);
+    }
+
+    @Test
+    void currentUserRejectsMissingBearerToken() {
+        assertThatThrownBy(() -> authService.currentUser(null))
+                .isInstanceOf(UnauthorizedException.class);
+
+        assertThatThrownBy(() -> authService.currentUser("token-value"))
+                .isInstanceOf(UnauthorizedException.class);
+    }
+
+    @Test
+    void currentUserReturnsTokenOwner() {
+        AppUser user = new AppUser(
+                "andrei",
+                "andrei@example.com",
+                passwordEncoder.encode("correct-password"),
+                Role.USER,
+                Instant.now()
+        );
+        AccessToken accessToken = new AccessToken("token-value", user, Instant.now(), Instant.now().plusSeconds(3600));
+        when(accessTokenRepository.findByToken("token-value")).thenReturn(Optional.of(accessToken));
+
+        var response = authService.currentUser("Bearer token-value");
+
+        assertThat(response.username()).isEqualTo("andrei");
+        assertThat(response.email()).isEqualTo("andrei@example.com");
     }
 }

@@ -3,6 +3,7 @@ package participation;
 import participation.Participation;
 import participation.dto.ParticipationRequest;
 import participation.ParticipationRepository;
+import participation.service.BadRequestException;
 import participation.service.ConflictException;
 import participation.service.NotFoundException;
 import participation.service.ParticipationService;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ParticipationServiceTest {
@@ -66,6 +68,16 @@ class ParticipationServiceTest {
     }
 
     @Test
+    void withdrawDeletesExistingParticipation() {
+        Participation participation = new Participation(1L, 2L, Instant.now());
+        when(participationRepository.findByEventIdAndUserId(1L, 2L)).thenReturn(Optional.of(participation));
+
+        participationService.withdraw(1L, 2L);
+
+        verify(participationRepository).delete(participation);
+    }
+
+    @Test
     void participantsForEventReturnsRegisteredUsers() {
         when(jdbcTemplate.queryForObject(eq("select count(1) from events where id = ?"), eq(Integer.class), eq(1L)))
                 .thenReturn(1);
@@ -76,5 +88,34 @@ class ParticipationServiceTest {
 
         assertThat(participants).hasSize(1);
         assertThat(participants.getFirst().userId()).isEqualTo(2L);
+    }
+
+    @Test
+    void participantsForEventRejectsMissingEvent() {
+        when(jdbcTemplate.queryForObject(eq("select count(1) from events where id = ?"), eq(Integer.class), eq(99L)))
+                .thenReturn(0);
+
+        assertThatThrownBy(() -> participationService.participantsForEvent(99L))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void eventsForUserReturnsRegisteredEvents() {
+        when(participationRepository.findByUserIdOrderByRegisteredAtDesc(2L))
+                .thenReturn(List.of(new Participation(3L, 2L, Instant.now())));
+
+        var events = participationService.eventsForUser(2L);
+
+        assertThat(events).hasSize(1);
+        assertThat(events.getFirst().eventId()).isEqualTo(3L);
+    }
+
+    @Test
+    void registerRejectsUnavailableEventData() {
+        when(jdbcTemplate.queryForObject(eq("select count(1) from events where id = ?"), eq(Integer.class), eq(1L)))
+                .thenThrow(new RuntimeException("database unavailable"));
+
+        assertThatThrownBy(() -> participationService.register(new ParticipationRequest(1L, 2L)))
+                .isInstanceOf(BadRequestException.class);
     }
 }
