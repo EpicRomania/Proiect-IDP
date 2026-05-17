@@ -3,7 +3,20 @@
 Proiect: EventHub - platforma de gestionare a evenimentelor
 Echipa: Negrea Andrei, Iancu Andrei-Vlad
 Grupa: 344C4
-Repository principal: https://github.com/EpicRomania/Proiect-IDP/tree/main
+Repository principal: https://github.com/EpicRomania/Proiect-IDP
+
+## [1.0.0] - 2026-05-17
+
+### Added
+
+- Finalizarea partii de CI/CD de catre Iancu prin adaugarea workflow-ului GitHub Actions pentru validarea automata a proiectului.
+- Configurarea pipeline-ului pentru rularea testelor Maven ale celor 3 microservicii Spring Boot, impachetarea serviciilor si validarea configuratiei Docker Compose.
+- Adaugarea pasilor de build pentru imaginile Docker ale serviciilor `user-authentication-service`, `event-management-service` si `participation-service`.
+- Adaugarea validarii optionale pentru manifesturile Kubernetes atunci cand exista un context Kubernetes disponibil.
+  
+### Verification / Validation
+
+- Testele automate si buildurile Docker au fost pregatite pentru rulare locala si pentru executie automata in GitHub Actions.
 
 ## [0.8.0] - 2026-05-16
 
